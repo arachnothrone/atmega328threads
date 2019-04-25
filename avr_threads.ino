@@ -7,15 +7,16 @@ Thread taskOne = Thread();
 Thread taskTwo = Thread();
 
 typedef struct {
-  char symbol;
-  bool dir;
-  int x_begin;
-  int x_end;
-  int x_old;
-  int x_coord; 
+  char symbol;// = ' ';
+  bool dir;// = false;
+  int x_begin;// = 9;
+  int x_end;// = 15;
+  int x_old;// = 12;
+  int x_coord;// = 12; 
 } Arrow;
 
-Arrow animatedArrow[6] = {' ', false, 9, 15, 12, 12};
+//Arrow* animatedArrow = (Arrow*)malloc(sizeof(Arrow));
+Arrow animatedArrow[] = {' ', false, 9, 15, 12, 12};
 
 void taskOneFunc(){
   // Printing seconds since restart on the first row
