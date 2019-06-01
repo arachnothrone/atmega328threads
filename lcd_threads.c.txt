@@ -1,6 +1,35 @@
 #include <LiquidCrystal.h>
 #include <Thread.h>
 
+/*
+
+LCD 1602
+Uno/Micro
+
+LCD       UNO/Micro
+
+Vss <- GND (Power line)
+Vdd <- +5V (Power line)
+V0  <- Pot2 (50KOhm), Pot1,3 -> GND
+RS  <- 7  Digital
+RW  <- GND
+E   <- 8  Digital
+D0
+D1
+D2
+D3
+D4  <- 9  Digital
+D5  <- 10 Digital
+D6  <- 11 Digital
+D7  <- 12 Digital
+A   <- +5V (Backlight)
+K   <- GND (Backlight)
+
+Light Sensor 1 -> GND
+Light Sensor 2 -> A0
+       2 -> R10K -> +5V 
+*/
+
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
@@ -16,8 +45,7 @@ typedef struct {
   int x_coord;// = 12; 
 } Arrow;
 
-//Arrow* animatedArrow = (Arrow*)malloc(sizeof(Arrow));
-Arrow animatedArrow[] = {' ', false, 9, 15, 9, 9};
+Arrow animatedArrow[] = {' ', false, 9, 15, 12, 12};
 
 void taskOneFunc(){
   // Printing seconds since restart on the first row
@@ -32,17 +60,12 @@ void taskTwoFunc(){
   //Arrow animatedArrow;
   arrowStep(animatedArrow);
   delay(120);
-//  lcd.setCursor(15, 1);
-//  lcd.write(' ');
-//  lcd.setCursor(14, 1);
-//  lcd.write('@');
 }
 
 void arrowStep(Arrow *self){
   // function performs one single movement of the character ">" or "<"
   // depending on its current movement direction
   
-  //char symbol;
   if(self->dir)
     self->symbol = '>';
   else
@@ -65,41 +88,31 @@ void arrowStep(Arrow *self){
 
   // debug info on the second row: current coordinate and moving direction
   lcd.setCursor(5, 1);
-  lcd.print("        ");
-  int sc;
-  sc = self->x_coord < 10 ? 6 : 5;
-  lcd.setCursor(sc, 1);
   lcd.print(self->x_coord);
-  lcd.print('|');
-  lcd.print(self->dir ? "true" : "false");
+  lcd.print('=');
+  lcd.print(self->dir);
 }
 
 void setup(){
+  // setup function, runs once in the beginning
+  
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
   lcd.write("Sec: ");
-  lcd.setCursor(0, 1);
-  lcd.write("Dbg:");
-  //Arrow animatedArrow = {" ", true, 12, 15, 12, 12};
+
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
-  //taskTwo.onRun(arrowStep(animatedArrow));
-  taskOne.setInterval(100);  // call taskOne every 1000 ms
-  taskTwo.setInterval(300);   // call taskTwo every 100 ms
+
+  taskOne.setInterval(1000);  // call taskOne every 1000 ms
+  taskTwo.setInterval(100);   // call taskTwo every 100 ms
 }
 
 void loop(){
+  // main loop
   
   if (taskOne.shouldRun())
     taskOne.run();
 
   if (taskTwo.shouldRun())
     taskTwo.run();
- 
-//  lcd.setCursor(0, 1);
-//  lcd.write("+");
-//  delay(33);
-//  lcd.setCursor(0, 1);
-//  lcd.write(".");
-//  delay(33);
 }
