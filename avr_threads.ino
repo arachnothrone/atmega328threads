@@ -91,10 +91,10 @@ void sdCardProgram() {
   lcd.write("SD Card Init...");
   lcd.setCursor(0, 1);
   if (!card.init(SPI_HALF_SPEED, 4))
-    lcd.write("Initialization failed");
+    lcd.write("Init failed");
   else
-    lcd.write("Initialization OK");
-  delay(1000);
+    lcd.write("Init OK");
+  delay(3000);
   //char cardType[10];
   String cardType = "xxxx";
   lcd.setCursor(0, 1);
@@ -113,7 +113,7 @@ void sdCardProgram() {
   }
   lcd.print("Card Type: ");
   lcd.print(cardType);
-  delay(2000);
+  delay(5000);
 }
 
 void setup(){
