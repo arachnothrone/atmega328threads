@@ -1,11 +1,16 @@
 #include <LiquidCrystal.h>
 #include <Thread.h>
 
+#include <SPI.h>  // for sd card
+#include <SD.h>
+
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
                             // positions 9 and 15
+
+
 
 typedef struct {
   char symbol;// = ' ';
@@ -74,7 +79,45 @@ void arrowStep(Arrow *self){
   lcd.print(self->dir ? "true" : "false");
 }
 
+void sdCardProgram() {
+  // setup sd card variables
+  Sd2Card card;
+  SdVolume volume;
+  SdFile root;
+  
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.write("SD Card Init...");
+  lcd.setCursor(0, 1);
+  if (!card.init(SPI_HALF_SPEED, 4))
+    lcd.write("Initialization failed");
+  else
+    lcd.write("Initialization OK");
+  delay(1000);
+  //char cardType[10];
+  String cardType = "xxxx";
+  lcd.setCursor(0, 1);
+  switch (card.type()) {
+    case SD_CARD_TYPE_SD1:
+      cardType = "SD1";
+      break;
+    case SD_CARD_TYPE_SD2:
+      cardType = "SD2";
+      break;
+    case SD_CARD_TYPE_SDHC:
+      cardType = "SDHC";
+      break;
+    default:
+      cardType = "Unknown";
+  }
+  lcd.print("Card Type: ");
+  lcd.print(cardType);
+  delay(2000);
+}
+
 void setup(){
+  sdCardProgram();
+  
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
   lcd.write("Sec: ");
