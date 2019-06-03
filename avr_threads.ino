@@ -80,6 +80,7 @@ void arrowStep(Arrow *self){
 }
 
 void sdCardProgram() {
+  // SD reader is connected to SPI pins (MISO/MOSI/SCK/CS, 5V pwr)
   // setup sd card variables
   Sd2Card card;
   SdVolume volume;
