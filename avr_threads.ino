@@ -114,6 +114,29 @@ void sdCardProgram() {
   lcd.print("Card Type: ");
   lcd.print(cardType);
   delay(5000);
+  if (!volume.init(card)) {
+    lcd.print("No FAT16/32\npartition.");
+    delay(3000);
+  }
+  else {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    //lcd.autoscroll();
+    uint32_t volumeSize;
+    volumeSize = volume.blocksPerCluster();    // clusters are collections of blocks
+    volumeSize *= volume.clusterCount();       // we'll have a lot of clusters
+    volumeSize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1KB)
+    lcd.print("Vol. size (Kb):");
+    lcd.setCursor(0, 1);
+    lcd.print(volumeSize);
+    delay(7000);
+    lcd.clear();
+    root.openRoot(volume);
+    // list all files in the card with date and size
+    root.ls();
+    delay(5000);
+    //lcd.noAutoscroll();
+  }
 }
 
 void setup(){
