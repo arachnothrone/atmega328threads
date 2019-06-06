@@ -9,6 +9,8 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
                             // positions 9 and 15
+Thread taskThr = Thread();  // thread for task three, read and print ligh sensor data
+
 
 
 
@@ -43,6 +45,18 @@ void taskTwoFunc(){
 //  lcd.write('@');
 }
 
+void taskThreeFunc(){
+  // Read and display light sensor data at the end of the second line
+  int lightSensorVal = analogRead(A0);
+  int sc;
+  sc = lightSensorVal < 1000 ? 13 : 12;       // align 3-4 digit value
+  sc = lightSensorVal < 100 ? sc + 1 : sc;    // consider 2 digit value as well
+  lcd.setCursor(12, 1);
+  lcd.print("    ");                          // erase previous value
+  lcd.setCursor(sc, 1);
+  lcd.print(lightSensorVal);                  // print new value (0-4 digits)
+}
+
 void arrowStep(Arrow *self){
   // function performs one single movement of the character ">" or "<"
   // depending on its current movement direction
@@ -69,10 +83,10 @@ void arrowStep(Arrow *self){
     self->x_coord--;
 
   // debug info on the second row: current coordinate and moving direction
-  lcd.setCursor(5, 1);
+  lcd.setCursor(3, 1);
   lcd.print("        ");
   int sc;
-  sc = self->x_coord < 10 ? 6 : 5;
+  sc = self->x_coord < 10 ? 4 : 3;    // align one/two-digit number
   lcd.setCursor(sc, 1);
   lcd.print(self->x_coord);
   lcd.print('|');
@@ -146,13 +160,15 @@ void setup(){
   lcd.setCursor(0, 0);
   lcd.write("Sec: ");
   lcd.setCursor(0, 1);
-  lcd.write("Dbg:");
+  lcd.write("D:");
   //Arrow animatedArrow = {" ", true, 12, 15, 12, 12};
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
+  taskThr.onRun(taskThreeFunc);
   //taskTwo.onRun(arrowStep(animatedArrow));
   taskOne.setInterval(100);  // call taskOne every 1000 ms
   taskTwo.setInterval(300);   // call taskTwo every 100 ms
+  taskThr.setInterval(1770);  // call taskThree every 1.77 sec
 }
 
 void loop(){
@@ -162,6 +178,9 @@ void loop(){
 
   if (taskTwo.shouldRun())
     taskTwo.run();
+
+  if (taskThr.shouldRun())
+    taskThr.run();
  
 //  lcd.setCursor(0, 1);
 //  lcd.write("+");
