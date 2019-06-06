@@ -9,10 +9,7 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
                             // positions 9 and 15
-Thread taskThr = Thread();  // thread for task three, read and print ligh sensor data
-
-
-
+Thread taskThr = Thread();  // thread for task three, read and print light sensor data at the end of the second row
 
 typedef struct {
   char symbol;// = ' ';
@@ -166,7 +163,7 @@ void setup(){
   taskTwo.onRun(taskTwoFunc);
   taskThr.onRun(taskThreeFunc);
   //taskTwo.onRun(arrowStep(animatedArrow));
-  taskOne.setInterval(100);  // call taskOne every 1000 ms
+  taskOne.setInterval(100);   // call taskOne every 1000 ms
   taskTwo.setInterval(300);   // call taskTwo every 100 ms
   taskThr.setInterval(1770);  // call taskThree every 1.77 sec
 }
