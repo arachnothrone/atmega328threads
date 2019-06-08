@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 #include <Thread.h>
-
-#include <SPI.h>  // for sd card
+//#include <stdlib.h>   // for itoa()
+#include <SPI.h>      // for sd card
 #include <SD.h>
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
@@ -48,6 +48,7 @@ void taskThreeFunc(){
   // Read and display light sensor data at the end of the second line
   int lightSensorVal = analogRead(A0);
   int sc;
+  //char buf[4];                                // for variant with itoa() of lightSensorVal
   sc = lightSensorVal < 1000 ? 13 : 12;       // align 3-4 digit value
   sc = lightSensorVal < 100 ? sc + 1 : sc;    // consider 2 digit value as well
   lcd.setCursor(12, 1);
@@ -57,11 +58,11 @@ void taskThreeFunc(){
   // write to log
   logfile = SD.open("lghtsnsr.log", FILE_WRITE);
   if (logfile){
-    logfile.println("Light sensor value:");// %i", lightSensorVal);
-    logfile.println(lightSensorVal);
+    //logfile.printf("Light sensor value: %s", itoa(lightSensorVal, buf, 10));  // itoa() variant
+    logfile.print(String("Light sensor value: ") + lightSensorVal + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');   // using String wrapping, which has dynamic concatenation
     logfile.close();
     lcd.setCursor(sc - 1, 1);
-    lcd.print("+");
+    lcd.print("+");             // indicate successful writing to the log
   } else {
     lcd.setCursor(sc - 1, 1);
     lcd.print("?");  
