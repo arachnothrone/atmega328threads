@@ -23,6 +23,8 @@ typedef struct {
 //Arrow* animatedArrow = (Arrow*)malloc(sizeof(Arrow));
 Arrow animatedArrow[] = {' ', false, 9, 15, 9, 9};
 
+File logfile;  //lghtsnsr.log;
+
 void taskOneFunc(){
   // Printing seconds since restart on the first row
   lcd.setCursor(5, 0);
@@ -52,6 +54,18 @@ void taskThreeFunc(){
   lcd.print("    ");                          // erase previous value
   lcd.setCursor(sc, 1);
   lcd.print(lightSensorVal);                  // print new value (0-4 digits)
+  // write to log
+  logfile = SD.open("lghtsnsr.log", FILE_WRITE);
+  if (logfile){
+    logfile.println("Light sensor value:");// %i", lightSensorVal);
+    logfile.println(lightSensorVal);
+    logfile.close();
+    lcd.setCursor(sc - 1, 1);
+    lcd.print("+");
+  } else {
+    lcd.setCursor(sc - 1, 1);
+    lcd.print("?");  
+  }
 }
 
 void arrowStep(Arrow *self){
@@ -142,9 +156,20 @@ void sdCardProgram() {
     lcd.print(volumeSize);
     delay(7000);
     lcd.clear();
-    root.openRoot(volume);
+    //root.openRoot(volume);
     // list all files in the card with date and size
-    root.ls();
+    //root.ls();
+
+    SD.begin();   // (CS_pin) -> sd card initialization
+    logfile = SD.open("lghtsnsr.log", FILE_WRITE);    // create log file on the card
+    if (logfile){
+      logfile.println("Starting log...");
+      logfile.close();
+      lcd.print("LOG CREATED [OK]");
+    }
+    else
+      lcd.print("FILE ERROR [01]");
+    
     delay(5000);
     //lcd.noAutoscroll();
   }
