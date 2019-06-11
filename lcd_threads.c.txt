@@ -28,6 +28,24 @@ K   <- GND (Backlight)
 Light Sensor 1 -> GND
 Light Sensor 2 -> A0
        2 -> R10K -> +5V 
+
+
+AM2320 Temp & Humidity sensor
+
++-------+
+| . . . |
+| . . . |
+| . . . |
+| . . . |
+| . . . |
++-------+
+ 1 2 3 4
+
+1. VDD:  Power supply (3.1V~5.5V)  		-> 5v
+2. SDA:  Serial data, bi-directional port	-> A4
+3. GND:  Ground					-> GND
+4. SCL:  Serial clock, input port		-> A5
+
 */
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
