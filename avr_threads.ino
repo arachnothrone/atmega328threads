@@ -3,13 +3,20 @@
 //#include <stdlib.h>   // for itoa()
 #include <SPI.h>      // for sd card
 #include <SD.h>
+//#include <Wire.h>     // for AM2320
+//#include <AM2320.h>   // for AM2320
+#include "Adafruit_Sensor.h"  // for AM2320, connect to I2C
+#include "Adafruit_AM2320.h"
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+//AM2320 temp_humid;
+Adafruit_AM2320 temp_humid = Adafruit_AM2320();
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
                             // positions 9 and 15
 Thread taskThr = Thread();  // thread for task three, read and print light sensor data at the end of the second row
+Thread taskFour = Thread(); // read temp & humidity sensor, print to serial
 
 typedef struct {
   char symbol;// = ' ';
@@ -23,7 +30,8 @@ typedef struct {
 //Arrow* animatedArrow = (Arrow*)malloc(sizeof(Arrow));
 Arrow animatedArrow[] = {' ', false, 9, 15, 9, 9};
 
-File logfile;  //lghtsnsr.log;
+File logfile;         //lghtsnsr.log
+File logTempHumid;    // temphd.log
 
 void taskOneFunc(){
   // Printing seconds since restart on the first row
@@ -67,6 +75,32 @@ void taskThreeFunc(){
     lcd.setCursor(sc - 1, 1);
     lcd.print("?");  
   }
+}
+
+void taskFourFunc(){
+  // Read and display & send temperature & humidity from AM2320
+//  switch(temp_humid.Read()){
+//    case 2:
+//      Serial.println("Temperature sensor: CRC failed");
+//      break;
+//    case 1:
+//      Serial.println("Temperature sensor: Offline");
+//      break;
+//    case 0:
+//  Serial.print("Temperature: ");
+//  Serial.print(temp_humid.readTemperature());
+//  Serial.print(" C, humidity: ");
+//  Serial.print(temp_humid.readHumidity());
+//  Serial.println(" %");
+  logTempHumid = SD.open("temphd.log", FILE_WRITE);
+  if(logTempHumid){
+    logTempHumid.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');  
+    logTempHumid.close();
+  }
+  Serial.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
+//      break;  
+    
+//  }
 }
 
 void arrowStep(Arrow *self){
@@ -178,6 +212,7 @@ void sdCardProgram() {
 
 void setup(){
   sdCardProgram();
+  temp_humid.begin();   // init am2320
   
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
@@ -188,10 +223,12 @@ void setup(){
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
   taskThr.onRun(taskThreeFunc);
+  taskFour.onRun(taskFourFunc);
   //taskTwo.onRun(arrowStep(animatedArrow));
   taskOne.setInterval(100);   // call taskOne every 1000 ms
   taskTwo.setInterval(300);   // call taskTwo every 100 ms
   taskThr.setInterval(1770);  // call taskThree every 1.77 sec
+  taskFour.setInterval(5000); // call temp & humid every 5 sec
 }
 
 void loop(){
@@ -204,6 +241,9 @@ void loop(){
 
   if (taskThr.shouldRun())
     taskThr.run();
+
+  if (taskFour.shouldRun())
+    taskFour.run();
  
 //  lcd.setCursor(0, 1);
 //  lcd.write("+");

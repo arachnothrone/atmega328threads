@@ -30,7 +30,8 @@ Light Sensor 2 -> A0
        2 -> R10K -> +5V 
 
 
-AM2320 Temp & Humidity sensor
+AM2320 Temp & Humidity sensor, use Adafruit_unified_sensor & Adafruit_AM2320 libraries.
+Connect to I2C
 
 +-------+
 | . . . |
@@ -40,11 +41,11 @@ AM2320 Temp & Humidity sensor
 | . . . |
 +-------+
  1 2 3 4
-
+						   i2c if:
 1. VDD:  Power supply (3.1V~5.5V)  		-> 5v
-2. SDA:  Serial data, bi-directional port	-> A4
+2. SDA:  Serial data, bi-directional port	-> SDA
 3. GND:  Ground					-> GND
-4. SCL:  Serial clock, input port		-> A5
+4. SCL:  Serial clock, input port		-> SCL
 
 */
 
