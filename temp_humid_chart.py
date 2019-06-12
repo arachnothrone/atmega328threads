@@ -15,6 +15,9 @@ if __name__ == "__main__":
         sys.exit(USAGE)
 
     plotData = []
+    t = []
+    h = []
+    z = []
     file = args[1]
     with open(file, 'r') as f:
         for ln in f.readlines():
@@ -30,6 +33,22 @@ if __name__ == "__main__":
                 humidity = 0
                 time = 0
             plotData.append((temp, humidity, time))
+            t.append(temp)
+            h.append(humidity)
+            z.append(time)
 
-    print(plotData)
-
+    # "compress" the data - take every 100th element
+    # for i in range(0, len(t)):
+    #     if i % 100 == 0:
+    #         pass
+    #     else:
+    #         t.pop(i)
+    #         h.pop(i)
+    #         z.pop(i)
+    t = t[::100]
+    h = h[::100]
+    z = z[::100]
+    #print(plotData)
+    #print(len(t), len(h), len(z))
+    plt.plot(z, h)
+    plt.show()
