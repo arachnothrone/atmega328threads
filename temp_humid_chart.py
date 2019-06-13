@@ -48,6 +48,11 @@ if __name__ == "__main__":
     t = t[::100]
     h = h[::100]
     z = z[::100]
+    outputFile = open("temphumid.log", 'w')
+    outputFile.write("Time, temperature C, humidity %\n")
+    for (tt, hh, zz) in zip(t, h, z):
+        outputFile.write("{}, {}, {}\n".format(zz, tt, hh))
+    outputFile.close()
     #print(plotData)
     #print(len(t), len(h), len(z))
     plt.plot(z, h)
