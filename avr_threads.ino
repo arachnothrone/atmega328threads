@@ -79,6 +79,7 @@ void taskThreeFunc(){
 
 void taskFourFunc(){
   // Read and display & send temperature & humidity from AM2320
+  // and athmospheric pressure taken from BMP180 GY68 Digital Barometric Pressure Sensor Board Module compatible with BMP085
 //  switch(temp_humid.Read()){
 //    case 2:
 //      Serial.println("Temperature sensor: CRC failed");

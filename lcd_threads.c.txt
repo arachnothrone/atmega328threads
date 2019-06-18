@@ -47,6 +47,24 @@ Connect to I2C
 3. GND:  Ground					-> GND
 4. SCL:  Serial clock, input port		-> SCL
 
+
+BMP180 GY68 Digital Barometric Pressure Sensor Board Module compatible with BMP085
+
++-------+
+| . . . |
+| . . . |
+| . . . |
+| . . . |
+| . . . |
++-------+
+ 1 2 3 4
+						   i2c if:
+?. VDD:  Power supply (3.1V~5.5V)  		-> ??
+?. SDA:  Serial data, bi-directional port	-> ??
+?. GND:  Ground					-> ??
+?. SCL:  Serial clock, input port		-> ??
+
+
 */
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
