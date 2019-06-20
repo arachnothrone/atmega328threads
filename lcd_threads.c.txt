@@ -49,6 +49,7 @@ Connect to I2C
 
 
 BMP180 GY68 Digital Barometric Pressure Sensor Board Module compatible with BMP085
+(has pull-up resistors for I2C, remove all external resistors on the bus if there were any)
 
 +-------+
 | . . . |
@@ -59,11 +60,10 @@ BMP180 GY68 Digital Barometric Pressure Sensor Board Module compatible with BMP0
 +-------+
  1 2 3 4
 						   i2c if:
-?. VDD:  Power supply (3.1V~5.5V)  		-> ??
-?. SDA:  Serial data, bi-directional port	-> ??
-?. GND:  Ground					-> ??
-?. SCL:  Serial clock, input port		-> ??
-
+1. VDD:  Power supply (3.1V~5.5V)  		-> 5v
+2. GND:  Ground					-> GND
+3. SCL:  Serial clock, input port		-> SCL
+4. SDA:  Serial data, bi-directional port	-> SDA
 
 */
 

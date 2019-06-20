@@ -7,10 +7,12 @@
 //#include <AM2320.h>   // for AM2320
 #include "Adafruit_Sensor.h"  // for AM2320, connect to I2C
 #include "Adafruit_AM2320.h"
+#include "Adafruit_BMP085.h"  // Pressure sensor, I2C (with pullup resistors onboard)
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 //AM2320 temp_humid;
 Adafruit_AM2320 temp_humid = Adafruit_AM2320();
+Adafruit_BMP085 bmp;
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
@@ -99,6 +101,7 @@ void taskFourFunc(){
     logTempHumid.close();
   }
   Serial.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
+  Serial.print(String("Pressure: ") + bmp.readPressure() + " Temp: " + bmp.readTemperature() + " Alt: " + bmp.readAltitude() + " Pressure sea level: " + bmp.readSealevelPressure() + '\n');
 //      break;  
     
 //  }
@@ -214,6 +217,7 @@ void sdCardProgram() {
 void setup(){
   sdCardProgram();
   temp_humid.begin();   // init am2320
+  bmp.begin();          // init bmp180
   
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
