@@ -69,7 +69,7 @@ void taskThreeFunc(){
   logfile = SD.open("lghtsnsr.log", FILE_WRITE);
   if (logfile){
     //logfile.printf("Light sensor value: %s", itoa(lightSensorVal, buf, 10));  // itoa() variant
-    logfile.print(String("Light sensor value: ") + lightSensorVal + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');   // using String wrapping, which has dynamic concatenation
+    logfile.print(String("** Light sensor value: ") + lightSensorVal + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');   // using String wrapping, which has dynamic concatenation
     logfile.close();
     lcd.setCursor(sc - 1, 1);
     lcd.print("+");             // indicate successful writing to the log
@@ -97,11 +97,12 @@ void taskFourFunc(){
 //  Serial.println(" %");
   logTempHumid = SD.open("temphd.log", FILE_WRITE);
   if(logTempHumid){
-    logTempHumid.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');  
+    logTempHumid.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
+    logTempHumid.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
     logTempHumid.close();
   }
-  Serial.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
-  Serial.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
+  //Serial.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
+  //Serial.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
 //      break;  
     
 //  }
@@ -232,7 +233,7 @@ void setup(){
   //taskTwo.onRun(arrowStep(animatedArrow));
   taskOne.setInterval(100);   // call taskOne every 1000 ms
   taskTwo.setInterval(300);   // call taskTwo every 100 ms
-  taskThr.setInterval(1770);  // call taskThree every 1.77 sec
+  taskThr.setInterval(3770);  // call taskThree every 1.77 sec
   taskFour.setInterval(2000); // call temp & humid every 5 sec
 }
 
