@@ -106,6 +106,7 @@ void taskFourFunc(){
   }
   //Serial.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
   //Serial.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
+  Serial.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %, Pressure: " + bmp.readPressure() * PAMMHG + " mmHg\n"); 
 //      break;  
     
 //  }
