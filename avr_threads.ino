@@ -9,7 +9,7 @@
 #include "Adafruit_AM2320.h"
 #include "Adafruit_BMP085.h"  // Pressure sensor, I2C (with pullup resistors onboard)
 #include "DS3231.h"   // RTC
-
+#include <U8x8lib.h>
 
 #define PAMMHG (0.00750062)
 
@@ -18,6 +18,8 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 Adafruit_AM2320 temp_humid = Adafruit_AM2320();
 Adafruit_BMP085 bmp;
 RTClib RTC;
+
+U8X8_SSD1306_128X32_UNIVISION_SW_I2C oled(/* clock=*/ 5, /* data=*/ 4, /* reset=*/ U8X8_PIN_NONE);   // OLEDs without Reset of the Display
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
@@ -71,17 +73,19 @@ void taskThreeFunc(){
   lcd.setCursor(sc, 1);
   lcd.print(lightSensorVal);                  // print new value (0-4 digits)
   // write to log
-  logfile = SD.open("lghtsnsr.log", FILE_WRITE);
-  if (logfile){
-    //logfile.printf("Light sensor value: %s", itoa(lightSensorVal, buf, 10));  // itoa() variant
-    logfile.print(String("** Light sensor value: ") + lightSensorVal + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');   // using String wrapping, which has dynamic concatenation
-    logfile.close();
-    lcd.setCursor(sc - 1, 1);
-    lcd.print("+");             // indicate successful writing to the log
-  } else {
-    lcd.setCursor(sc - 1, 1);
-    lcd.print("?");  
-  }
+  /* Uncomment this -------------*/
+  // logfile = SD.open("lghtsnsr.log", FILE_WRITE);
+  // if (logfile){
+  //   //logfile.printf("Light sensor value: %s", itoa(lightSensorVal, buf, 10));  // itoa() variant
+  //   logfile.print(String("** Light sensor value: ") + lightSensorVal + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');   // using String wrapping, which has dynamic concatenation
+  //   logfile.close();
+  //   lcd.setCursor(sc - 1, 1);
+  //   lcd.print("+");             // indicate successful writing to the log
+  // } else {
+  //   lcd.setCursor(sc - 1, 1);
+  //   lcd.print("?");  
+  // }
+  /* ------------------------------*/
 }
 
 void taskFourFunc(){
@@ -115,24 +119,28 @@ void taskFourFunc(){
     + (day  < 10 ? "/0" : "/") + day
     + (hour < 10 ? " 0" : " ") + hour
     + (minu < 10 ? ":0" : ":") + minu 
-    + (seco < 10 ? ":0" : ":") + seco 
+    + (seco < 10 ? ":0" : ":") + seco + ","
     + " Temperature: " + temp_humid.readTemperature() 
     + " C, Humidity: " + temp_humid.readHumidity() 
     + " %, Pressure: " + bmp.readPressure() * PAMMHG + " mmHg\n";
-  
-  logTempHumid = SD.open("temphd.log", FILE_WRITE);
-  if(logTempHumid){
-    //logTempHumid.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
-    //logTempHumid.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
-    /*
-    logTempHumid.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %, Pressure: " + bmp.readPressure() * PAMMHG + " mmHg\n");  
-    */
-    logTempHumid.print(logString);
-    logTempHumid.close();
-  }
+  /* Uncomment this -------------*/
+  // logTempHumid = SD.open("temphd.log", FILE_WRITE);
+  // if(logTempHumid){
+  //   //logTempHumid.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
+  //   //logTempHumid.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
+  //   /*
+  //   logTempHumid.print(String("Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %, Pressure: " + bmp.readPressure() * PAMMHG + " mmHg\n");  
+  //   */
+  //   logTempHumid.print(logString);
+  //   logTempHumid.close();
+  // }
+  /* -------------------------*/
   //Serial.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
   //Serial.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
   Serial.print(logString);
+  oled.drawString(0, 1, "Temperature:");
+  oled.setCursor(0, 2);
+  oled.print(temp_humid.readTemperature());
   /*
   Serial.print(String("Time: ") 
     + (year < 10 ? "0" : ""  ) + year
@@ -261,6 +269,11 @@ void setup(){
   sdCardProgram();
   temp_humid.begin();   // init am2320
   bmp.begin();          // init bmp180
+
+  oled.begin();
+  oled.setPowerSave(0);
+  oled.setFont(u8x8_font_chroma48medium8_r);
+  oled.drawString(0,0,"Test STRING...");
   
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
