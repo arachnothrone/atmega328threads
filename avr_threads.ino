@@ -1,9 +1,9 @@
-#include <LiquidCrystal.h>
+//#include <LiquidCrystal.h>
 #include <Thread.h>
 //#include <stdlib.h>   // for itoa()
 #include <SPI.h>      // for sd card
 #include <SD.h>
-//#include <Wire.h>     // for AM2320
+#include <Wire.h>     // for AM2320
 //#include <AM2320.h>   // for AM2320
 #include "Adafruit_Sensor.h"  // for AM2320, connect to I2C
 #include "Adafruit_AM2320.h"
@@ -13,7 +13,7 @@
 
 #define PAMMHG (0.00750062)
 
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+//LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 //AM2320 temp_humid;
 Adafruit_AM2320 temp_humid = Adafruit_AM2320();
 Adafruit_BMP085 bmp;
@@ -44,10 +44,12 @@ File logTempHumid;    // temphd.log
 
 void taskOneFunc(){
   // Printing seconds since restart on the first row
-  lcd.setCursor(5, 0);
-  lcd.write("    ");
-  lcd.setCursor(5, 0);
-  lcd.print(millis() / 1000);
+  // lcd.setCursor(5, 0);
+  // lcd.write("    ");
+  // lcd.setCursor(5, 0);
+  // lcd.print(millis() / 1000);
+  oled.setCursor(5, 0);
+  oled.print(millis() / 1000);
 }
 
 void taskTwoFunc(){
@@ -68,10 +70,10 @@ void taskThreeFunc(){
   //char buf[4];                                // for variant with itoa() of lightSensorVal
   sc = lightSensorVal < 1000 ? 13 : 12;       // align 3-4 digit value
   sc = lightSensorVal < 100 ? sc + 1 : sc;    // consider 2 digit value as well
-  lcd.setCursor(12, 1);
-  lcd.print("    ");                          // erase previous value
-  lcd.setCursor(sc, 1);
-  lcd.print(lightSensorVal);                  // print new value (0-4 digits)
+  // lcd.setCursor(12, 1);
+  // lcd.print("    ");                          // erase previous value
+  oled.setCursor(sc, 1);
+  oled.print(lightSensorVal);                  // print new value (0-4 digits)
   // write to log
   /* Uncomment this -------------*/
   // logfile = SD.open("lghtsnsr.log", FILE_WRITE);
@@ -169,10 +171,10 @@ void arrowStep(Arrow *self){
     self->symbol = '<';
   
   // update LCD 
-  lcd.setCursor(self->x_old, 0);
-  lcd.write(" ");
-  lcd.setCursor(self->x_coord, 0);
-  lcd.write(self->symbol);
+  oled.setCursor(self->x_old, 0);
+  oled.write(" ");
+  oled.setCursor(self->x_coord, 0);
+  oled.write(self->symbol);
 
   // update current coordinate and direction
   if (self->x_coord == self->x_end || self->x_coord == self->x_begin)
@@ -184,14 +186,14 @@ void arrowStep(Arrow *self){
     self->x_coord--;
 
   // debug info on the second row: current coordinate and moving direction
-  lcd.setCursor(3, 1);
-  lcd.print("        ");
+  oled.setCursor(3, 1);
+  oled.print("        ");
   int sc;
   sc = self->x_coord < 10 ? 4 : 3;    // align one/two-digit number
-  lcd.setCursor(sc, 1);
-  lcd.print(self->x_coord);
-  lcd.print('|');
-  lcd.print(self->dir ? "true" : "false");
+  oled.setCursor(sc, 1);
+  oled.print(self->x_coord);
+  oled.print('|');
+  oled.print(self->dir ? "true" : "false");
 }
 
 void sdCardProgram() {
@@ -201,18 +203,19 @@ void sdCardProgram() {
   SdVolume volume;
   SdFile root;
   
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.write("SD Card Init...");
-  lcd.setCursor(0, 1);
-  if (!card.init(SPI_HALF_SPEED, 4))
-    lcd.write("Init failed");
+  //oled.begin();
+  oled.setCursor(0, 0);
+  oled.write("SD Card Init...");
+  oled.setCursor(0, 1);
+  if (!card.init(SPI_HALF_SPEED, 4)){
+    oled.write("Init failed");
+    Serial.print("SD: INIT FAILED");}
   else
-    lcd.write("Init OK");
+    oled.write("Init OK");
   delay(3000);
   //char cardType[10];
   String cardType = "xxxx";
-  lcd.setCursor(0, 1);
+  oled.setCursor(0, 1);
   switch (card.type()) {
     case SD_CARD_TYPE_SD1:
       cardType = "SD1";
@@ -226,26 +229,26 @@ void sdCardProgram() {
     default:
       cardType = "Unknown";
   }
-  lcd.print("Card Type: ");
-  lcd.print(cardType);
+  oled.print("Card Type: ");
+  oled.print(cardType);
   delay(5000);
   if (!volume.init(card)) {
-    lcd.print("No FAT16/32\npartition.");
+    oled.print("No FAT16/32\npartition.");
     delay(3000);
   }
   else {
-    lcd.clear();
-    lcd.setCursor(0, 0);
+    oled.clear();
+    oled.setCursor(0, 0);
     //lcd.autoscroll();
     uint32_t volumeSize;
     volumeSize = volume.blocksPerCluster();    // clusters are collections of blocks
     volumeSize *= volume.clusterCount();       // we'll have a lot of clusters
     volumeSize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1KB)
-    lcd.print("Vol. size (Kb):");
-    lcd.setCursor(0, 1);
-    lcd.print(volumeSize);
+    oled.print("Vol. size (Kb):");
+    oled.setCursor(0, 1);
+    oled.print(volumeSize);
     delay(7000);
-    lcd.clear();
+    oled.clear();
     //root.openRoot(volume);
     // list all files in the card with date and size
     //root.ls();
@@ -255,10 +258,10 @@ void sdCardProgram() {
     if (logfile){
       logfile.println("Starting log...");
       logfile.close();
-      lcd.print("LOG CREATED [OK]");
+      oled.print("LOG CREATED [OK]");
     }
     else
-      lcd.print("FILE ERROR [01]");
+      oled.print("FILE ERROR [01]");
     
     delay(5000);
     //lcd.noAutoscroll();
@@ -266,20 +269,25 @@ void sdCardProgram() {
 }
 
 void setup(){
+  Wire.begin();
+  
+  oled.begin();
+  oled.setPowerSave(0);
+  oled.setFont(u8x8_font_chroma48medium8_r);
+  oled.setContrast(11);
+  oled.drawString(0,0,"Test STRING...");
+
   sdCardProgram();
   temp_humid.begin();   // init am2320
   bmp.begin();          // init bmp180
 
-  oled.begin();
-  oled.setPowerSave(0);
-  oled.setFont(u8x8_font_chroma48medium8_r);
-  oled.drawString(0,0,"Test STRING...");
   
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.write("Sec: ");
-  lcd.setCursor(0, 1);
-  lcd.write("D:");
+  
+  // lcd.begin(16, 2);
+  oled.setCursor(0, 0);
+  oled.write("Sec: ");
+  oled.setCursor(0, 1);
+  oled.write("D:");
   //Arrow animatedArrow = {" ", true, 12, 15, 12, 12};
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
