@@ -1,3 +1,19 @@
+/*
+I2C addresses:
+
+Found address: 60 (0x3C)     - OLED 4-line display
+Found address: 60 (0x3C)     - OLED 8-lines
+Found address: 87 (0x57)     - RTC 1
+Found address: 104 (0x68)    - RTC 2
+Found address: 119 (0x77)    - pressure sensor
+not found AM2320, 92 >>> 0x5C ?
+
+
+
+*/
+
+
+
 //#include <LiquidCrystal.h>
 #include <Thread.h>
 //#include <stdlib.h>   // for itoa()
@@ -19,7 +35,8 @@ Adafruit_AM2320 temp_humid = Adafruit_AM2320();
 Adafruit_BMP085 bmp;
 RTClib RTC;
 
-U8X8_SSD1306_128X32_UNIVISION_SW_I2C oled(/* clock=*/ 5, /* data=*/ 4, /* reset=*/ U8X8_PIN_NONE);   // OLEDs without Reset of the Display
+//U8X8_SSD1306_128X32_UNIVISION_SW_I2C oled(/* clock=*/ 5, /* data=*/ 4, /* reset=*/ U8X8_PIN_NONE);   // OLEDs without Reset of the Display
+U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(/* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // pin remapping with ESP8266 HW I2C
 
 Thread taskOne = Thread();  // thread for task one, print time in seconds since controller start
 Thread taskTwo = Thread();  // thread for task two, animation for ">" moving in the first LCD row between
@@ -121,7 +138,7 @@ void taskFourFunc(){
     + (day  < 10 ? "/0" : "/") + day
     + (hour < 10 ? " 0" : " ") + hour
     + (minu < 10 ? ":0" : ":") + minu 
-    + (seco < 10 ? ":0" : ":") + seco + ","
+    + (seco < 10 ? ":0" : ":") + seco + "," 
     + " Temperature: " + temp_humid.readTemperature() 
     + " C, Humidity: " + temp_humid.readHumidity() 
     + " %, Pressure: " + bmp.readPressure() * PAMMHG + " mmHg\n";
@@ -270,12 +287,13 @@ void sdCardProgram() {
 
 void setup(){
   Wire.begin();
+  Serial.begin(115200);
   
   oled.begin();
   oled.setPowerSave(0);
-  oled.setFont(u8x8_font_chroma48medium8_r);
+  oled.setFont(u8x8_font_chroma48medium8_r); // u8x8_font_chroma48medium8_r u8x8_font_px437wyse700a_2x2_r u8g2_font_courB12_tf 
   oled.setContrast(11);
-  oled.drawString(0,0,"Test STRING...");
+  // oled.drawString(0,0,"Test STRING...");
 
   sdCardProgram();
   temp_humid.begin();   // init am2320
@@ -285,9 +303,9 @@ void setup(){
   
   // lcd.begin(16, 2);
   oled.setCursor(0, 0);
-  oled.write("Sec: ");
+  oled.print("Sec: ");
   oled.setCursor(0, 1);
-  oled.write("D:");
+  oled.print("D:");
   //Arrow animatedArrow = {" ", true, 12, 15, 12, 12};
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
@@ -313,11 +331,4 @@ void loop(){
 
   if (taskFour.shouldRun())
     taskFour.run();
- 
-//  lcd.setCursor(0, 1);
-//  lcd.write("+");
-//  delay(33);
-//  lcd.setCursor(0, 1);
-//  lcd.write(".");
-//  delay(33);
 }
