@@ -73,7 +73,7 @@ void taskTwoFunc(){
   // Running arrow ">" or "<"
   //Arrow animatedArrow;
   arrowStep(animatedArrow);
-  delay(120);
+  //delay(120);
 //  lcd.setCursor(15, 1);
 //  lcd.write(' ');
 //  lcd.setCursor(14, 1);
@@ -157,9 +157,15 @@ void taskFourFunc(){
   //Serial.print(String("AM2320: Temperature: ") + temp_humid.readTemperature() + " C, Humidity: " + temp_humid.readHumidity() + " %" + " time[" + String(millis() / 1000, DEC) + "] s" + '\n');
   //Serial.print(String("BMP180: Temperature: ") + bmp.readTemperature() + " C, Pressure: " + bmp.readPressure() * 0.007501 + " mmhHg, Alt: " + bmp.readAltitude() + "m, Pressure (sea level): " + bmp.readSealevelPressure() + '\n');
   Serial.print(logString);
-  oled.drawString(0, 1, "Temperature:");
+  // oled.drawString(0, 2, "Temp: ");
   oled.setCursor(0, 2);
-  oled.print(temp_humid.readTemperature());
+  oled.print("Temp.   : ");
+  oled.print(int(temp_humid.readTemperature()));
+  oled.print(" C");
+  oled.setCursor(0, 3);
+  oled.print("Humidity: ");
+  oled.print(int(temp_humid.readHumidity()));
+  oled.print(" %");
   /*
   Serial.print(String("Time: ") 
     + (year < 10 ? "0" : ""  ) + year
@@ -202,15 +208,14 @@ void arrowStep(Arrow *self){
    else
     self->x_coord--;
 
-  // debug info on the second row: current coordinate and moving direction
-  oled.setCursor(3, 1);
-  oled.print("        ");
-  int sc;
-  sc = self->x_coord < 10 ? 4 : 3;    // align one/two-digit number
-  oled.setCursor(sc, 1);
-  oled.print(self->x_coord);
-  oled.print('|');
-  oled.print(self->dir ? "true" : "false");
+  // // debug info on the second row: current coordinate and moving direction
+  // oled.setCursor(3, 1);
+  // oled.print("        ");
+  // int sc;
+  // sc = self->x_coord < 10 ? 4 : 3;    // align one/two-digit number
+  // oled.setCursor(sc, 1);
+  // oled.print(self->x_coord);
+  // oled.print(self->dir ? "true" : "false");
 }
 
 void sdCardProgram() {
@@ -222,17 +227,17 @@ void sdCardProgram() {
   
   //oled.begin();
   oled.setCursor(0, 0);
-  oled.write("SD Card Init...");
+  oled.print("SD Card Init...");
   oled.setCursor(0, 1);
   if (!card.init(SPI_HALF_SPEED, 4)){
-    oled.write("Init failed");
+    oled.print("Init failed");
     Serial.print("SD: INIT FAILED");}
   else
-    oled.write("Init OK");
+    oled.print("Init OK");
   delay(3000);
   //char cardType[10];
   String cardType = "xxxx";
-  oled.setCursor(0, 1);
+  oled.setCursor(0, 2);
   switch (card.type()) {
     case SD_CARD_TYPE_SD1:
       cardType = "SD1";
@@ -244,13 +249,13 @@ void sdCardProgram() {
       cardType = "SDHC";
       break;
     default:
-      cardType = "Unknown";
+      cardType = "Unkn";
   }
   oled.print("Card Type: ");
-  oled.print(cardType);
+  oled.println(cardType);
   delay(5000);
   if (!volume.init(card)) {
-    oled.print("No FAT16/32\npartition.");
+    oled.print("No FAT partition");
     delay(3000);
   }
   else {
@@ -281,6 +286,7 @@ void sdCardProgram() {
       oled.print("FILE ERROR [01]");
     
     delay(5000);
+    oled.clear();
     //lcd.noAutoscroll();
   }
 }
@@ -300,12 +306,12 @@ void setup(){
   bmp.begin();          // init bmp180
 
   
-  
+  oled.clear();
   // lcd.begin(16, 2);
   oled.setCursor(0, 0);
   oled.print("Sec: ");
   oled.setCursor(0, 1);
-  oled.print("D:");
+  //oled.print("D:");
   //Arrow animatedArrow = {" ", true, 12, 15, 12, 12};
   taskOne.onRun(taskOneFunc);
   taskTwo.onRun(taskTwoFunc);
