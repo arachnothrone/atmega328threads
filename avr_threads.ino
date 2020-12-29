@@ -87,8 +87,8 @@ void taskThreeFunc(){
   //char buf[4];                                // for variant with itoa() of lightSensorVal
   sc = lightSensorVal < 1000 ? 13 : 12;       // align 3-4 digit value
   sc = lightSensorVal < 100 ? sc + 1 : sc;    // consider 2 digit value as well
-  // lcd.setCursor(12, 1);
-  // lcd.print("    ");                          // erase previous value
+  oled.setCursor(12, 1);
+  oled.print("    ");                          // erase previous value
   oled.setCursor(sc, 1);
   oled.print(lightSensorVal);                  // print new value (0-4 digits)
   // write to log
@@ -166,6 +166,14 @@ void taskFourFunc(){
   oled.print("Humidity: ");
   oled.print(int(temp_humid.readHumidity()));
   oled.print(" %");
+  // oled.setCursor(0, 4);
+  // oled.print("Pressure: ");
+  // oled.print(int(bmp.readPressure() * PAMMHG));
+  // oled.print("mmH");
+  oled.setCursor(0, 1);
+  oled.print("P: ");
+  oled.print(int(bmp.readPressure() * PAMMHG));
+  oled.print(" mmHg");
   /*
   Serial.print(String("Time: ") 
     + (year < 10 ? "0" : ""  ) + year
